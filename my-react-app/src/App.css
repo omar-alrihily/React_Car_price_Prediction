@@ -1,0 +1,56 @@
+@import './tailwind.css';
+
+body{
+    background-color: #f0fdf4;
+}
+
+
+
+.slider-container {
+    position: relative;
+    
+  }
+  
+  .slider-input {
+    width: 100%;
+    -webkit-appearance: none; /* Remove default styles for WebKit browsers */
+    appearance: none; /* Remove default styles for other browsers */
+     /* Set the slider width */
+    height: 5px; /* Set the slider height */
+    background-color: #dcfce7; /* Set the background color of the slider track */
+    outline: none; /* Remove the default focus styles */
+    border-radius: 10px;
+  }
+  
+
+
+  /* Styling for the slider thumb (handle) */
+.slider-input::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Remove default styles for WebKit browsers */
+    appearance: none; /* Remove default styles for other browsers */
+    width: 16px; /* Set the width of the thumb */
+    height: 16px; /* Set the height of the thumb */
+    background-color: #16a34a; /* Set the background color of the thumb */
+    border-radius: 50%; /* Create a circular thumb */
+    cursor:auto; /* Change cursor to pointer on hover */
+  }
+
+  .slider-input::-moz-range-thumb {
+    width: 16px; /* Set the width of the thumb for Firefox */
+    height: 16px; /* Set the height of the thumb for Firefox */
+    background-color: #16a34a; /* Set the background color of the thumb for Firefox */
+    border-radius: 50%; /* Create a circular thumb for Firefox */
+    cursor: pointer; /* Change cursor to pointer on hover for Firefox */
+  }
+
+
+  .slider-value {
+    position: absolute;
+    top: 60px; /* Adjust position */
+    
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #16a34a;
+    
+  }
+  
