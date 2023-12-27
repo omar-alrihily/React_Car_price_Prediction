@@ -2,77 +2,83 @@ import { useState, useRef, useEffect } from 'react';
 
 
 function PredictForm() {
-  const [vehicleType, setVehicleType] = useState('');
-  const [options, setOptions] = useState('');
-  const [km, setKm] = useState('');
-  const [makeYear, setMakeYear] = useState('');
-  const [result, setResult] = useState('');
-  const [predictionResult, setPredictionResult] = useState('');
-  const [showResult, setShowResult] = useState(false);
+ // Setting up state variables using the useState hook
+const [vehicleType, setVehicleType] = useState(''); // State for vehicle type
+const [options, setOptions] = useState(''); // State for options
+const [km, setKm] = useState(''); // State for kilometers
+const [makeYear, setMakeYear] = useState(''); // State for vehicle manufacturing year
+const [result, setResult] = useState(''); // State for prediction result message
+const [predictionResult, setPredictionResult] = useState(''); // State for predicted result value
+const [showResult, setShowResult] = useState(false); // State to control displaying prediction result
 
-  const sliderRef = useRef(null);
+// Creating a reference for the slider
+const sliderRef = useRef(null);
 
-  const handleSliderChange = (e) => {
-    setKm(e.target.value);
+// Handling changes in the slider value
+const handleSliderChange = (e) => {
+  setKm(e.target.value); // Update kilometers based on slider value
+};
+
+// Function to calculate and update slider value position
+const updateSliderValuePosition = (value) => {
+  if (sliderRef.current) {
+    // Calculate slider position based on value, width, min, and max values of the slider
+    // Adjust the offset as needed for proper positioning
+    const inputWidth = sliderRef.current.offsetWidth;
+    const inputMin = parseFloat(sliderRef.current.min) || 0;
+    const inputMax = parseFloat(sliderRef.current.max) || 100;
+    const sliderPosition = ((value - inputMin) / (inputMax - inputMin)) * inputWidth;
+    return `calc(${sliderPosition}px - 20px)`; 
+  }
+  return '0px'; // Default position if sliderRef is not available yet
+};
+
+// Effect to update slider position when kilometers (km) changes
+useEffect(() => {
+  updateSliderValuePosition(km); // Update slider position
+}, [km]);
+
+// Function to make a prediction based on the provided inputs
+const predict = () => {
+  const mileage = km / 1.6; // Convert km to mileage
+  const vehicleAge = 2023 - makeYear; // Calculate vehicle age
+
+  // Prepare input data for the prediction API
+  const inputData = {
+    Type: vehicleType,
+    Options: options,
+    Mileage: parseFloat(mileage),
+    vehicle_age: parseFloat(vehicleAge),
   };
 
-  const updateSliderValuePosition = (value) => {
-    if (sliderRef.current) {
-      const inputWidth = sliderRef.current.offsetWidth;
-      const inputMin = parseFloat(sliderRef.current.min) || 0;
-      const inputMax = parseFloat(sliderRef.current.max) || 100;
-      const sliderPosition = ((value - inputMin) / (inputMax - inputMin)) * inputWidth;
-      return `calc(${sliderPosition}px - 20px)`; // Adjust the offset as needed
-    }
-    return '0px'; // Default position if sliderRef is not available yet
-  };
-
-  useEffect(() => {
-    // Force update the position when component is mounted or 'km' changes
-    updateSliderValuePosition(km);
-  }, [km]);
-
-
-  const predict = () => {
-    const mileage = km / 1.6;
-    const vehicleAge = 2023 - makeYear;
-
-    const inputData = {
-      Type: vehicleType,
-      Options: options,
-      Mileage: parseFloat(mileage),
-      vehicle_age: parseFloat(vehicleAge),
-    };
-
-    fetch('http://127.0.0.1:5000/predict', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(inputData)
+  // Fetch prediction from the server
+  fetch('http://127.0.0.1:5000/predict', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(inputData)
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json(); // Parse response JSON
     })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        let prediction = data.prediction;
-        if (prediction < 0) {
-          prediction = Math.abs(prediction); // Convert negative to positive
-        }
-        setResult(`Prediction: ${prediction} SR`);
-        setPredictionResult(prediction);
-        setShowResult(true);
-        console.log(result)
-      })
-      .catch(error => {
-        console.error('There was a problem with the fetch operation:', error);
-      });
-
-    
-  };
+    .then(data => {
+      let prediction = data.prediction;
+      if (prediction < 0) {
+        prediction = Math.abs(prediction); // Convert negative to positive prediction
+      }
+      setResult(`Prediction: ${prediction} SR`); // Update prediction result message
+      setPredictionResult(prediction); // Set predicted result value
+      setShowResult(true); // Show the prediction result
+      console.log(result); // Log the result (may not reflect the updated state immediately)
+    })
+    .catch(error => {
+      console.error('There was a problem with the fetch operation:', error); // Log any fetch errors
+    });
+};
 
   return (
     <div>
@@ -180,19 +186,27 @@ function PredictForm() {
         {km}
       </div>
     </div>
-          <div className="mb-4 mt-6">
-            <label htmlFor="makeYear" className="block text-lg font-medium text-gray-700">
-              Model Year :
-            </label>
-            <input
-              type="number"
-              id="makeYear"
-              placeholder="Enter vehicle age"
-              className="border border-gray-300 rounded-lg w-full py-3 px-4 mt-1 text-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              value={makeYear}
-              onChange={(e) => setMakeYear(e.target.value)}
-            />
-          </div>
+    <div className="mb-4 mt-6">
+  <label htmlFor="makeYear" className="block text-lg font-medium text-gray-700">
+    Model Year:
+  </label>
+  <select
+    id="makeYear"
+    className="border border-gray-300 rounded-lg w-full py-3 px-4 mt-1 text-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+    value={makeYear}
+    onChange={(e) => setMakeYear(e.target.value)}
+  >
+    <option value="">Select Year</option>
+    {Array.from({ length: 31 }, (_, i) => 2023 - i).map((year) => (
+      <option key={year} value={year}>
+        {year}
+      </option>
+    ))}
+  </select>
+</div>
+
+
+
           <button
             type="button"
             className="bg-green-600 text-white py-3 px-6 rounded-lg text-lg hover:bg-green-600 focus:outline-none focus:bg-green-600"
@@ -202,11 +216,24 @@ function PredictForm() {
           </button>
         </form>
       </div>
-      <div id="result" className={`bg-green-600 p-8 rounded-md ${showResult ? 'block' : 'hidden'}`}>
-  {showResult && <p className="text-white font-bold">{result}</p>}
+      <div
+  id="result"
+  className={`bg-green-600 border border-gray-300 p-6 rounded-lg shadow-md ${showResult ? 'block' : 'hidden'}`}
+>
+  {showResult && (
+    <p className="text-white font-semibold text-lg">
+      {result}
+    </p>
+  )}
 </div>
 
+
+
+
+
     </div>
+
+
   </div>
   
   );
