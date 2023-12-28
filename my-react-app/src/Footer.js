@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import EmailIcon from './email-icon.png';
-import LinkedInIcon from './linkedin-icon.png';
-import GitHubIcon from './github-icon.png';
+import EmailIcon from './icons/email-icon.png';
+import LinkedInIcon from './icons/linkedin-icon.png';
+import GitHubIcon from './icons/github-icon.png';
 
 const Footer = () => {
   return (
@@ -29,7 +29,7 @@ const Footer = () => {
             </a>
           </li>
           <li className="mr-4">
-            <a href="https://www.linkedin.com/omar-alrehaili" target="_blank" rel="noopener noreferrer" className="text-white flex items-center">
+            <a href="https://linkedin.com/in/omar-alrehaili" target="_blank" rel="noopener noreferrer" className="text-white flex items-center">
               <motion.img
                 initial={{ opacity: 0, scale: 0.5 }} // Initial animation values for the image
                 animate={{ opacity: 1, scale: 1 }} // Animation when component mounts

@@ -12,7 +12,7 @@ const NavBar = () => {
       <main className="js">
         <section className="aw-header bg-green-600 border-b border-gray-200 shadow-md" >
           <header className="container mx-auto flex items-center justify-between flex-wrap px-2 py-4 lg:p-6 " >
-            <div id="mobile-menu__toggler" className="block lg:hidden"></div>
+            
 
             <div className="aw-header__logo flex items-center flex-shrink-0 text-white hover:text-white mx-2 lg:mr-6 order-1 transition">
               <svg
