@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 
 function PredictForm() {
@@ -28,7 +29,7 @@ const updateSliderValuePosition = (value) => {
     const inputMin = parseFloat(sliderRef.current.min) || 0;
     const inputMax = parseFloat(sliderRef.current.max) || 100;
     const sliderPosition = ((value - inputMin) / (inputMax - inputMin)) * inputWidth;
-    return `calc(${sliderPosition}px - 20px)`; 
+    return `calc(${sliderPosition}px - 30px)`; 
   }
   return '0px'; // Default position if sliderRef is not available yet
 };
@@ -70,7 +71,7 @@ const predict = () => {
       if (prediction < 0) {
         prediction = Math.abs(prediction); // Convert negative to positive prediction
       }
-      setResult(`Prediction: ${prediction} SR`); // Update prediction result message
+      setResult(`تقدر سيارتك بــ ${prediction} ريال سعودي`); // Update prediction result message
       setPredictionResult(prediction); // Set predicted result value
       setShowResult(true); // Show the prediction result
       console.log(result); // Log the result (may not reflect the updated state immediately)
@@ -85,17 +86,17 @@ const predict = () => {
     
     <div className="w-full md:w-5/6 lg:w-2/2 xl:w-1/2 mx-auto mt-20">
       <div className="md:h-3/4 lg:h-3/4 xl:h-3/4 bg-white shadow-md rounded px-8 pt-8 pb-8 mb-4 w-full xl:w-1/1">
-        <form>
+        <form >
           <div className="w-full mb-6">
-            <label htmlFor="vehicleType" className="block text-lg font-medium text-black">
-              Vehicle Type:
+            <label htmlFor="vehicleType" className="block text-lg font-medium text-black" >
+              نوع السيارة :
             </label>
             <select
   id="vehicleType"
   className="border border-gray-300 rounded-lg w-full py-3 px-4 mt-1 text-lg focus:outline-none focus:ring-green-500 focus:border-green-600 appearance-none"  value={vehicleType}
   onChange={(e) => setVehicleType(e.target.value)}
 >
-  <option value="">Select vehicle type</option>
+  <option value="">اختر موديل سيارتك</option>
   <option value="Accent">Accent</option>
   <option value="Camry">Camry</option>
   <option value="Hilux">Hilux</option>
@@ -148,7 +149,7 @@ const predict = () => {
 
 <div className="w-full mb-6">
   <label htmlFor="options" className="block text-lg font-medium text-black">
-    Options:
+    المواصفات :
   </label>
   <select
     id="options"
@@ -156,18 +157,17 @@ const predict = () => {
     className="border border-gray-300 rounded-lg w-full py-3 px-4 mt-1 text-lg focus:outline-none focus:ring-green-600 focus:border-green-600 appearance-none"
     onChange={(e) => setOptions(e.target.value)}
   >
-    <option value="">Select Option</option>
-    <option value="Full">Full</option>
-    <option value="Semi Full">Semi Full</option>
-    <option value="Standard">Standard</option>
+    <option value="">اختر نوع المواصفات</option>
+    <option value="Full">فل</option>
+    <option value="Semi Full">نص فل</option>
+    <option value="Standard">ستاندر</option>
   </select>
 </div>
 
           
           <div className="slider-container">
       <label htmlFor="km" className="block text-lg  font-medium text-gray-700 mb-2 mt-0">
-        KM :
-      </label>
+عداد الكيلو متر       </label>
       <input 
         type="range"
         id="km"
@@ -181,14 +181,14 @@ const predict = () => {
       />
       <div
         className="slider-value "
-        style={{ left: updateSliderValuePosition(km) }}
+        style={{ right: updateSliderValuePosition(km) }}
       >
         {km}
       </div>
     </div>
-    <div className="mb-4 mt-6">
+ <div className="mb-4 mt-6">
   <label htmlFor="makeYear" className="block text-lg font-medium text-gray-700">
-    Model Year:
+    سنة الموديل
   </label>
   <select
     id="makeYear"
@@ -196,7 +196,7 @@ const predict = () => {
     value={makeYear}
     onChange={(e) => setMakeYear(e.target.value)}
   >
-    <option value="">Select Year</option>
+    <option value="">اختر السنة</option>
     {Array.from({ length: 31 }, (_, i) => 2023 - i).map((year) => (
       <option key={year} value={year}>
         {year}
@@ -209,23 +209,39 @@ const predict = () => {
 
           <button
             type="button"
-            className="bg-green-600 text-white py-3 px-6 rounded-lg text-lg hover:bg-green-600 focus:outline-none focus:bg-green-600"
+            className="bg-green-600 text-white py-3 px-6 rounded-lg text-lg hover:bg-green-600 focus:outline-none focus:bg-green-600 mr-56 mt-4 "
             onClick={predict}
+            style={{fontWeight:700}}
           >
-            Predict Price
+            السعر المتوقع
           </button>
         </form>
       </div>
-      <div
-  id="result"
-  className={`bg-green-600 border border-gray-300 p-6 rounded-lg shadow-md ${showResult ? 'block' : 'hidden'}`}
->
-  {showResult && (
-    <p className="text-white font-semibold text-lg">
-      {result}
-    </p>
-  )}
-</div>
+      <motion.div
+        initial={{ opacity: 0 }} // Initial animation values
+        animate={{ opacity: 1 }} // Animation when component mounts
+        transition={{ duration: 0.5, delay: 0.4 }} // Duration for the animation with a slight delay
+        className={`bg-green-600 border border-gray-300 p-6 rounded-lg shadow-md ${showResult ? 'block' : 'hidden'}`}
+        id="result"
+        
+      >
+         
+        {showResult && (
+          <motion.p
+            initial={{ opacity: 0 }} // Initial animation values
+            animate={{ opacity: 1 }} // Animation when component mounts
+            transition={{ duration: 2 }} // Duration for the animation
+            className="text-white font-semibold text-lg"
+          >
+            {result}
+          </motion.p>
+          
+        )}
+        <br/>
+         <p className="text-gray-100 text-base">تنويه : الأسعار مستنتجه من خلال الذكاء الاصطناعي لذلك قد تختلف عن اسعار السوق الحالية </p>
+      </motion.div>
+
+      
 
 
 
