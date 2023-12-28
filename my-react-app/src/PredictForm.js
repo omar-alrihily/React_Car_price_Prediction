@@ -53,7 +53,7 @@ const predict = () => {
   };
 
   // Fetch prediction from the server
-  fetch('http://127.0.0.1:5000/predict', {
+  fetch('https://omar-server1.onrender.com/predict', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
