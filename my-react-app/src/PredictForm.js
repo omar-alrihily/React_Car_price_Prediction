@@ -192,7 +192,7 @@ const predict = () => {
   </label>
   <select
     id="makeYear"
-    className="border border-gray-300 rounded-lg w-full py-3 px-4 mt-1 text-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+    className="border border-gray-300 rounded-lg w-full py-3 px-4 mt-1 text-sm focus:outline-none focus:ring-green-600 focus:border-green-600"
     value={makeYear}
     onChange={(e) => setMakeYear(e.target.value)}
   >
@@ -209,7 +209,7 @@ const predict = () => {
 
           <button
             type="button"
-            className="bg-green-600 text-white py-3 px-6 rounded-lg text-lg hover:bg-green-600 focus:outline-none focus:bg-green-600 mr-56 mt-4 "
+            className="bg-green-600 text-white py-3 px-3 rounded-lg text-sm hover:bg-green-600 focus:outline-none focus:bg-green-600 mr-56 mt-4 "
             onClick={predict}
             style={{fontWeight:700}}
           >

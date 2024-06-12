@@ -28,19 +28,7 @@ const Footer = () => {
               Email
             </a>
           </li>
-          <li className="mr-4">
-            <a href="https://linkedin.com/in/omar-alrehaili" target="_blank" rel="noopener noreferrer" className="text-white flex items-center">
-              <motion.img
-                initial={{ opacity: 0, scale: 0.5 }} // Initial animation values for the image
-                animate={{ opacity: 1, scale: 1 }} // Animation when component mounts
-                transition={{ duration: 0.5 }} // Duration for the animation
-                src={LinkedInIcon}
-                alt="LinkedIn"
-                className="h-6 w-6 mr-2"
-              />
-              LinkedIn
-            </a>
-          </li>
+          
           <li>
             <a href="https://github.com/omar-alrihily" target="_blank" rel="noopener noreferrer" className="text-white flex items-center">
               <motion.img
