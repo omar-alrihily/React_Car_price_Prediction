@@ -1,13 +1,17 @@
 
 import './App.css';
-import NavBar from './NavBar';
+
 import PredictForm from './PredictForm';
+import ProjectIntroCard from './ProjectIntroCard';
 import Footer from './Footer';
+
 
 function App() {
   return (
     <div className="App">
-      <NavBar/>
+      
+      <ProjectIntroCard/>
+
       <PredictForm/>
       <footer className="mt-11">
       <Footer/>

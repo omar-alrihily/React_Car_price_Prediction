@@ -9,8 +9,10 @@ const [options, setOptions] = useState(''); // State for options
 const [km, setKm] = useState(''); // State for kilometers
 const [makeYear, setMakeYear] = useState(''); // State for vehicle manufacturing year
 const [result, setResult] = useState(''); // State for prediction result message
-const [predictionResult, setPredictionResult] = useState(''); // State for predicted result value
+
 const [showResult, setShowResult] = useState(false); // State to control displaying prediction result
+const [loading, setLoading] = useState(false);
+const [delayedMessage, setDelayedMessage] = useState('');
 
 // Creating a reference for the slider
 const sliderRef = useRef(null);
@@ -40,11 +42,10 @@ useEffect(() => {
 }, [km]);
 
 // Function to make a prediction based on the provided inputs
-const predict = () => {
-  const mileage = km / 1.6; // Convert km to mileage
-  const vehicleAge = 2023 - makeYear; // Calculate vehicle age
+ const predict = () => {
+  const mileage = km / 1.6;
+  const vehicleAge = 2023 - makeYear;
 
-  // Prepare input data for the prediction API
   const inputData = {
     Type: vehicleType,
     Options: options,
@@ -52,39 +53,46 @@ const predict = () => {
     vehicle_age: parseFloat(vehicleAge),
   };
 
-  // Fetch prediction from the server
+  setLoading(true);
+  setShowResult(true);
+  setResult(''); // مسح النتيجة القديمة
+  setDelayedMessage(''); // مسح رسالة التأخير السابقة
+
+  // رسالة التأخير بعد 10 ثواني
+  const longWaitTimer = setTimeout(() => {
+    setDelayedMessage("  الرد قد يستغرق وقت أطول في المره الأولى فقط يمكنك ابقاء الصفحة والعودة لها لاحقا");
+  }, 10000);
+
   fetch('https://omar-server1.onrender.com/predict', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(inputData)
   })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json(); // Parse response JSON
+    .then(res => {
+      if (!res.ok) throw new Error('Network response was not ok');
+      return res.json();
     })
     .then(data => {
       let prediction = data.prediction;
-      if (prediction < 0) {
-        prediction = Math.abs(prediction); // Convert negative to positive prediction
-      }
-      setResult(`تقدر سيارتك بــ ${prediction} ريال سعودي`); // Update prediction result message
-      setPredictionResult(prediction); // Set predicted result value
-      setShowResult(true); // Show the prediction result
-      console.log(result); // Log the result (may not reflect the updated state immediately)
+      if (prediction < 0) prediction = Math.abs(prediction);
+      clearTimeout(longWaitTimer); // إلغاء التايمر عند وصول الرد
+      setResult(`تقدر سيارتك بــ ${prediction} ريال سعودي`);
+      setDelayedMessage(''); // مسح رسالة التأخير
     })
-    .catch(error => {
-      console.error('There was a problem with the fetch operation:', error); // Log any fetch errors
-    });
+    .catch(err => {
+      console.error(err);
+      clearTimeout(longWaitTimer);
+      setResult('حدث خطأ أثناء جلب النتيجة تأكد من إدخال جميع المعلومات المطلوبة بشكل صحيح');
+      setDelayedMessage('');
+    })
+    .finally(() => setLoading(false));
 };
+
 
   return (
     <div>
     
-    <div className="w-full md:w-5/6 lg:w-2/2 xl:w-1/2 mx-auto mt-20">
+    <div className="w-full h-full md:w-5/6 lg:w-2/2 xl:w-1/2 mx-auto mt-20">
       <div className="md:h-3/4 lg:h-3/4 xl:h-3/4 bg-white shadow-md rounded px-8 pt-8 pb-8 mb-4 w-full xl:w-1/1">
         <form >
           <div className="w-full mb-6">
@@ -197,7 +205,7 @@ const predict = () => {
     onChange={(e) => setMakeYear(e.target.value)}
   >
     <option value="">اختر السنة</option>
-    {Array.from({ length: 31 }, (_, i) => 2023 - i).map((year) => (
+    {Array.from({ length: 10 }, (_, i) => 2023 - i).map((year) => (
       <option key={year} value={year}>
         {year}
       </option>
@@ -206,40 +214,47 @@ const predict = () => {
 </div>
 
 
+<button
+  type="button"
+  className="bg-green-600 text-white py-3 px-3 rounded-lg text-sm hover:bg-green-600 focus:outline-none focus:bg-green-600 mr-56 mt-4"
+  onClick={predict}
+  style={{ fontWeight: 700 }}
+  disabled={loading} // لتعطيل الزر أثناء التحميل
+>
+  {loading ? "جاري الحساب..." : "السعر المتوقع"}
+</button>
+</form>
+</div>
 
-          <button
-            type="button"
-            className="bg-green-600 text-white py-3 px-3 rounded-lg text-sm hover:bg-green-600 focus:outline-none focus:bg-green-600 mr-56 mt-4 "
-            onClick={predict}
-            style={{fontWeight:700}}
-          >
-            السعر المتوقع
-          </button>
-        </form>
-      </div>
-      <motion.div
-        initial={{ opacity: 0 }} // Initial animation values
-        animate={{ opacity: 1 }} // Animation when component mounts
-        transition={{ duration: 0.5, delay: 0.4 }} // Duration for the animation with a slight delay
-        className={`bg-green-600 border border-gray-300 p-6 rounded-lg shadow-md ${showResult ? 'block' : 'hidden'}`}
-        id="result"
-        
-      >
-         
-        {showResult && (
-          <motion.p
-            initial={{ opacity: 0 }} // Initial animation values
-            animate={{ opacity: 1 }} // Animation when component mounts
-            transition={{ duration: 2 }} // Duration for the animation
-            className="text-white font-semibold text-lg"
-          >
-            {result}
-          </motion.p>
-          
-        )}
-        <br/>
-         <p className="text-gray-100 text-base">تنويه : الأسعار مستنتجه من خلال الذكاء الاصطناعي لذلك قد تختلف عن اسعار السوق الحالية </p>
-      </motion.div>
+<motion.div
+  initial={{ opacity: 0 }}
+  animate={{ opacity: showResult ? 1 : 0 }}
+  transition={{ duration: 0.5, delay: 0.4 }}
+  className={`bg-green-600 border border-gray-300 p-6 rounded-lg shadow-md ${showResult ? 'block' : 'hidden'}`}
+  id="result"
+>
+  {showResult && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      className="flex items-center space-x-2"
+    >
+      {loading && (
+        <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin ml-6"></div>
+      )}
+     <p className="text-white font-semibold text-lg ">
+  {loading ? (delayedMessage || "جاري معالجة الطلب... يرجى الانتظار") : result}
+</p>
+    </motion.div>
+  )}
+
+  {!loading && (
+    <p className="text-gray-100 text-base mt-2">
+      تنويه : الأسعار مستنتجه من خلال الذكاء الاصطناعي لذلك قد تختلف عن اسعار السوق الحالية
+    </p>
+  )}
+</motion.div>
 
       
 
